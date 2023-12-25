@@ -2,7 +2,8 @@
 A non-interactive, fully automated YouTube ReVanced patcher and installer, straight from latest releases.
 # HOW TO USE:
 ### PLEASE TAKE A LOOK AT THE SCRIPT FIRST BEFORE EXECUTING!!!
-Install dependencies: `curl`, Java Runtime `jre-openjdk-headless` or `jre-openjdk` will work.
+Install dependencies: `curl` , `wget` , Java Runtime `jre-openjdk-headless` or `jre-openjdk` will work.
+
 Clone into this repository:
 ```sh
 git clone https://github.com/dng-nguyn/auto-revanced-linux.git
