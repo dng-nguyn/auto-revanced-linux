@@ -20,4 +20,5 @@ Execute the script:
 ```
 A `revanced.apk` will be built for you.
 ## Credits
+[revanced](https://github.com/revanced) For making all of this possible
 [apkmirror-downloader](https://github.com/tanishqmanuja/apkmirror-downloader) For providing a way to download apks with a specified version straight from apkmirror
