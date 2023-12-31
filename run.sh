@@ -1,10 +1,15 @@
 #!/bin/bash
 ### PLEASE LOOK THROUGH THE SCRIPT BEFORE EXECUTING!!! ###
+# Remove old files if present:
+rm patch.jar cli.jar integrations.apk download.json yt.apk
+rm -d downloads
+# remove ReVanced cache
+rm -rd revanced-resource-cache
 # Download patches, integrations and cli
 echo "Downloading files..."
-curl -s https://api.github.com/repos/ReVanced/revanced-patches/releases/latest | grep "browser_download_url.*.jar" | cut -d : -f 2,3 | tr -d \" | wget -qi - -O patch.jar
-curl -s https://api.github.com/repos/ReVanced/revanced-cli/releases/latest  | grep "browser_download_url.*.jar" | cut -d : -f 2,3 | tr -d \" | wget -qi - -O cli.jar
-curl -s https://api.github.com/repos/ReVanced/revanced-integrations/releases/latest  | grep "browser_download_url.*.apk" | cut -d : -f 2,3 | tr -d \" | wget -qi - -O integrations.apk
+curl -s https://api.github.com/repos/ReVanced/revanced-patches/releases/latest | grep "browser_download_url.*.jar" | cut -d : -f 2,3 | tr -d \" | wget -i - -O patch.jar
+curl -s https://api.github.com/repos/ReVanced/revanced-cli/releases/latest  | grep "browser_download_url.*.jar" | cut -d : -f 2,3 | tr -d \" | wget -i - -O cli.jar
+curl -s https://api.github.com/repos/ReVanced/revanced-integrations/releases/latest  | grep "browser_download_url.*.apk" | cut -d : -f 2,3 | tr -d \" | wget -i - -O integrations.apk
 
 # Command to get the version
 echo "Getting version..."
