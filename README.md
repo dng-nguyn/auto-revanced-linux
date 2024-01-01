@@ -2,7 +2,7 @@
 A non-interactive, fully automated YouTube ReVanced patcher and installer, straight from latest releases.
 # HOW TO USE:
 ### PLEASE TAKE A LOOK AT THE SCRIPT FIRST BEFORE EXECUTING!!!
-Install dependencies: `curl` , `wget` , Java Runtime `jre-openjdk-headless` or `jre-openjdk` will work.
+Install dependencies: `curl` , `wget` , `jq` ,Java Runtime `jre-openjdk-headless` or `jre-openjdk` will work.
 
 Clone into this repository:
 ```sh
@@ -12,7 +12,6 @@ cd auto-revanced-linux
 Add execution permission for the script if required:
 ```sh
 chmod +x ./run.sh
-chmod +x apkmd
 ```
 Execute the script:
 ```sh
