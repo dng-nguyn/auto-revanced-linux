@@ -2,7 +2,23 @@
 A non-interactive, fully automated YouTube ReVanced patcher and installer, straight from latest releases.
 # HOW TO USE:
 ### PLEASE TAKE A LOOK AT THE SCRIPT FIRST BEFORE EXECUTING!!!
-Install dependencies: `curl` , `wget` , `jq` ,Java Runtime `jre-openjdk-headless` or `jre-openjdk` will work.
+Install dependencies: `curl` , `wget` , `jq` , `git` , Java Runtime `jre-openjdk-headless` or `jre-openjdk` will work.
+
+Distribution specific:
+
+Alpine Linux: 
+```sh
+sudo apk update && sudo apk add git wget curl jq openjdk18
+```
+Arch-based:
+```sh
+sudo pacman -S curl wget git jq jre-openjdk-headless
+```
+Debian-based:
+```sh
+sudo apt update && sudo apt install git wget curl jq openjdk-17-jre-headless
+```
+## Installation:
 
 Clone into this repository:
 ```sh
