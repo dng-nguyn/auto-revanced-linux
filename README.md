@@ -2,7 +2,7 @@
 A non-interactive, fully automated YouTube ReVanced patcher and installer, straight from latest releases.
 # HOW TO USE:
 ### PLEASE TAKE A LOOK AT THE SCRIPT FIRST BEFORE EXECUTING!!!
-Install dependencies: `curl` , `wget` , `jq` , `git` , Java Runtime `jre-openjdk-headless` or `jre-openjdk` will work.
+Install dependencies: `curl` , `wget` , `jq` , `git` , Java Runtime `jre-openjdk` version >11 will work. `jre-openjdk-headless` will throw an error.
 
 Distribution specific:
 
