@@ -12,7 +12,7 @@ sudo apk update && sudo apk add git wget curl jq openjdk18
 ```
 Arch-based:
 ```sh
-sudo pacman -S curl wget git jq jre-openjdk-headless
+sudo pacman -S curl wget git jq jre-openjdk
 ```
 Debian-based:
 ```sh
