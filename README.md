@@ -16,7 +16,7 @@ sudo pacman -S curl wget git jq jre-openjdk-headless
 ```
 Debian-based:
 ```sh
-sudo apt update && sudo apt install git wget curl jq openjdk-17-jre-headless
+sudo apt update && sudo apt install git wget curl jq openjdk-17-jre
 ```
 ## Installation:
 
