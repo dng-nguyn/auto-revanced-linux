@@ -1,6 +1,6 @@
 # auto-revanced-linux
 A non-interactive, fully automated YouTube ReVanced patcher and installer, straight from latest releases.
-Also check out the (Discord & Nextcloud integrations branch!)[https://github.com/dng-nguyn/auto-revanced-linux/tree/nextcloud_discord_auto]
+Also check out the [Discord & Nextcloud integrations branch!](https://github.com/dng-nguyn/auto-revanced-linux/tree/nextcloud_discord_auto)
 # HOW TO USE:
 ### PLEASE TAKE A LOOK AT THE SCRIPT FIRST BEFORE EXECUTING!!!
 Install dependencies: `curl` , `wget` , `jq` , `git` , Java Runtime `jre-openjdk` version >11 will work. `jre-openjdk-headless` will throw an error for some reason.
