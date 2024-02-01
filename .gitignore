@@ -3,7 +3,10 @@ cli.jar
 integrations.apk
 download.json
 yt.apk
-revanced.apk
+revanced*.apk
 revanced.keystore
 revanced-options.json 
 version.txt
+revanced.jks
+.env
+
