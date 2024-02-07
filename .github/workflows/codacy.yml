@@ -15,10 +15,10 @@ name: Codacy Security Scan
 
 on:
   push:
-    branches: [ "main" ]
+    branches: [ "main", "nextcloud_discord_auto" ]
   pull_request:
     # The branches below must be a subset of the branches above
-    branches: [ "main" ]
+    branches: [ "main", "nextcloud_discord_auto" ]
   schedule:
     - cron: '27 18 * * 0'
 
