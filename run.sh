@@ -1,13 +1,16 @@
 #!/bin/bash
 
+cd "$(dirname "$0")"
 source .env
 
+CURRENT_TIME=$(date +'%d/%m/%y %H:%M:%S')
+echo "$CURRENT_TIME Executing ReVanced script..." | curl -d "content=$(cat -)" -X POST $DISCORD_WEBHOOK_LOGS
 update_function() {
 # Download patches, integrations and cli
 echo "Downloading required files..."
-curl -s https://api.github.com/repos/ReVanced/revanced-patches/releases/latest | grep "browser_download_url.*.jar" | cut -d : -f 2,3 | tr -d \" | wget --show-progress -qi - -O patch.jar || { echo "Unable to download patcher"; exit 1; }
-curl -s https://api.github.com/repos/ReVanced/revanced-cli/releases/latest  | grep "browser_download_url.*.jar" | cut -d : -f 2,3 | tr -d \" | wget --show-progress -qi - -O cli.jar
-curl -s https://api.github.com/repos/ReVanced/revanced-integrations/releases/latest  | grep "browser_download_url.*.apk" | cut -d : -f 2,3 | tr -d \" | wget --show-progress -qi - -O integrations.apk
+curl -s https://api.github.com/repos/ReVanced/revanced-patches/releases/latest | grep "browser_download_url.*.jar" | grep -v ".asc"  | cut -d : -f 2,3 | tr -d \" | wget --show-progress -qi - -O patch.jar || { echo "Unable to download patcher"; exit 1; }
+curl -s https://api.github.com/repos/ReVanced/revanced-cli/releases/latest  | grep  "browser_download_url.*.jar" | grep -v ".asc" | cut -d : -f 2,3 | tr -d \" | wget --show-progress -qi - -O cli.jar
+curl -s https://api.github.com/repos/ReVanced/revanced-integrations/releases/latest  | grep "browser_download_url.*.apk" | grep -v ".asc" | cut -d : -f 2,3 | tr -d \" | wget --show-progress -qi - -O integrations.apk
 
 # Get apkmd from source
 curl -s https://api.github.com/repos/tanishqmanuja/apkmirror-downloader/releases/latest | grep "browser_download_url.*apkmd" | grep -v "apkmd.exe" | cut -d : -f 2,3 | tr -d \" | wget --show-progress -qi - -O apkmd
@@ -15,7 +18,8 @@ curl -s https://api.github.com/repos/tanishqmanuja/apkmirror-downloader/releases
 chmod +x ./apkmd
 # Command to get the version
 echo "Getting version..."
-current_version="$(curl -s https://raw.githubusercontent.com/ReVanced/revanced-patches/main/patches.json | jq -r '.[] | select(.compatiblePackages) | select(.compatiblePackages[] | .name == "com.google.android.youtube") | .compatiblePackages[].versions | if . == null then [] else map(select(. != null and . != "")) end | select(length > 0) | max_by(. // "0" | split(".") | map(tonumber))' | awk 'NR==1 {print}')"
+current_version=$(java -jar cli.jar list-versions patch.jar -f com.google.android.youtube | grep -oE '[0-9]+\.[0-9]+\.[0-9]+' | sort -V | tail -n 1)
+
 
 # Create a new JSON file with the updated version
 cat <<EOL > download.json
@@ -141,7 +145,7 @@ remove_files
 
 echo "Checking for updates..."
 
-latest_version=$(curl -s https://raw.githubusercontent.com/ReVanced/revanced-patches/main/patches.json | jq -r '.[] | select(.compatiblePackages) | select(.compatiblePackages[] | .name == "com.google.android.youtube") | .compatiblePackages[].versions | if . == null then [] else map(select(. != null and . != "")) end | select(length > 0) | max_by(. // "0" | split(".") | map(tonumber))' | awk 'NR==1 {print}')
+latest_version=$(curl -s https://raw.githubusercontent.com/ReVanced/revanced-patches/main/src/main/kotlin/app/revanced/patches/youtube/ad/video/VideoAdsPatch.kt | grep -oE '[0-9]+\.[0-9]+\.[0-9]+' | sort -V | tail -n 1)
 version_file="version.txt"
 
 trap 'remove_files' EXIT
@@ -153,22 +157,28 @@ if [ -e "$version_file" ]; then
 
     # Check if local_version is empty
     if [ -z "$local_version" ]; then
-        echo "version.txt is found, but it is empty. Executing the script..."
+        echo "version.txt is found, but it is empty. Executing the script..." | curl -d "content=$(cat -)" -X POST $DISCORD_WEBHOOK_LOGS
         nextcloud_run
     else
         # Compare versions
         if [ "$latest_version" \> "$local_version" ]; then
-            echo "Updating to the latest version: $latest_version"
+            echo "Updating to the latest version: $latest_version" | curl -d "content=$(cat -)" -X POST $DISCORD_WEBHOOK_LOGS
             nextcloud_run
         elif [ "$latest_version" = "$local_version" ]; then
-            echo "You're running on the latest version: $latest_version!"
+            echo "You're running on the latest version: $latest_version!" | curl -d "content=$(cat -)" -X POST $DISCORD_WEBHOOK_LOGS
             exit
         else
-            echo "You're running a newer version than expected: Current: $local_version, Source: $latest_version. Please double-check your existing version.txt!"
+            echo "You're running a newer version than expected: Current: $local_version, Source: $latest_version. Please double-check your existing version.txt!" | curl -d "content=$(cat -)" -X POST $DISCORD_WEBHOOK_LOGS
             exit 1
         fi
     fi
 else
-    echo "version.txt not found. Executing the script..."
+    echo "version.txt not found. Executing the script..." | curl -d "content=$(cat -)" -X POST $DISCORD_WEBHOOK_LOGS
     nextcloud_run
+fi
+
+if [ "$DELETE_AFTER_UPLOAD" == "true" ]; then
+    # Remove files if the var is true
+    echo "Removing local APK (Uploaded via Nextcloud)...." | curl -d "content=$(cat -)" -X POST $DISCORD_WEBHOOK_LOGS
+    rm -rf revanced-$current_version.apk
 fi
