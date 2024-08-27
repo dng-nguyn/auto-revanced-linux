@@ -29,9 +29,9 @@ cat <<EOL > download.json
   },
   "apps": [
     {
-      "name": "yt",
       "org": "google-inc",
       "repo": "youtube",
+      "outFile": "yt",
       "version": "$current_version"
     }
   ]
@@ -40,7 +40,6 @@ EOL
 
 echo "Downloading youtube version "$current_version"..."
 ./apkmd download.json
-mv ./downloads/yt.apk yt.apk
 rm -fd downloads
 echo "Patching youtube..."
 java -jar cli.jar patch \
