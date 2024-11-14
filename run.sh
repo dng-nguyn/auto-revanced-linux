@@ -3,14 +3,13 @@
 cd "$(dirname "$0")"
 source .env
 
-CURRENT_TIME=$(date +'%d/%m/%y %H:%M:%S')
+CURRENT_TIME=$(date +'<t:%s:F>')
 echo "$CURRENT_TIME Executing ReVanced script..." | curl -d "content=$(cat -)" -X POST $DISCORD_WEBHOOK_LOGS
 update_function() {
 # Download patches, integrations and cli
 echo "Downloading required files..."
-curl -s https://api.github.com/repos/ReVanced/revanced-patches/releases/latest | grep "browser_download_url.*.jar" | grep -v ".asc"  | cut -d : -f 2,3 | tr -d \" | wget --show-progress -qi - -O patch.jar || { echo "Unable to download patcher"; exit 1; }
+curl -s https://api.github.com/repos/ReVanced/revanced-patches/releases/latest | grep "browser_download_url.*.rvp" | grep -v ".asc"  | cut -d : -f 2,3 | tr -d \" | wget --show-progress -qi - -O patch.rvp
 curl -s https://api.github.com/repos/ReVanced/revanced-cli/releases/latest  | grep  "browser_download_url.*.jar" | grep -v ".asc" | cut -d : -f 2,3 | tr -d \" | wget --show-progress -qi - -O cli.jar
-curl -s https://api.github.com/repos/ReVanced/revanced-integrations/releases/latest  | grep "browser_download_url.*.apk" | grep -v ".asc" | cut -d : -f 2,3 | tr -d \" | wget --show-progress -qi - -O integrations.apk
 
 # Get apkmd from source
 curl -s https://api.github.com/repos/tanishqmanuja/apkmirror-downloader/releases/latest | grep "browser_download_url.*apkmd" | grep -v "apkmd.exe" | cut -d : -f 2,3 | tr -d \" | wget --show-progress -qi - -O apkmd
@@ -18,7 +17,7 @@ curl -s https://api.github.com/repos/tanishqmanuja/apkmirror-downloader/releases
 chmod +x ./apkmd
 # Command to get the version
 echo "Getting version..."
-current_version=$(java -jar cli.jar list-versions patch.jar -f com.google.android.youtube | grep -oE '[0-9]+\.[0-9]+\.[0-9]+' | sort -V | tail -n 1)
+current_version=$(java -jar cli.jar list-versions patch.rvp -f com.google.android.youtube | grep -oE '[0-9]+\.[0-9]+\.[0-9]+' | sort -V | tail -n 1)
 
 
 # Create a new JSON file with the updated version
@@ -40,22 +39,12 @@ EOL
 
 echo "Downloading youtube version "$current_version"..."
 ./apkmd download.json
-rm -fd downloads
+
 echo "Patching youtube..."
-java -jar cli.jar patch \
-  --patch-bundle=patch.jar \
-  --exclude="Spoof SIM country" \
-  --exclude="Spoof Wi-Fi connection" \
-  --exclude="Predictive back gesture" \
-  --exclude="Enable Android debugging" \
-  --exclude="Theme" \
-  --exclude="Enable debugging" \
-  --exclude="Always autorepeat" \
-  --include="GmsCore Support" \
+java -jar cli.jar patch yt.apk \
+  --patches=patch.rvp \
   --keystore=revanced.jks \
-  -p \
-  --merge=integrations.apk \
-  yt.apk \
+  --purge \
   -o revanced-$current_version.apk
 
 echo "Finished! Output: revanced-$current_version.apk"
@@ -68,7 +57,7 @@ echo "Saved version.txt for further updates!"
 
 remove_files () {
 echo "Cleaning files..."
-rm -f patch.jar cli.jar integrations.apk download.json yt.apk apkmd
+rm -f patch.rvp cli.jar integrations.apk download.json yt.apk apkmd
 # remove ReVanced cache
 rm -rf revanced*-resource-cache
 rm -f apkmd
@@ -144,7 +133,7 @@ remove_files
 
 echo "Checking for updates..."
 
-latest_version=$(curl -s https://raw.githubusercontent.com/ReVanced/revanced-patches/main/src/main/kotlin/app/revanced/patches/youtube/ad/video/VideoAdsPatch.kt | grep -oE '[0-9]+\.[0-9]+\.[0-9]+' | sort -V | tail -n 1)
+latest_version=$(curl -s https://raw.githubusercontent.com/ReVanced/revanced-patches/refs/heads/main/patches/src/main/kotlin/app/revanced/patches/youtube/ad/video/VideoAdsPatch.kt | grep -oE '[0-9]+\.[0-9]+\.[0-9]+' | sort -V | tail -n 1)
 version_file="version.txt"
 
 trap 'remove_files' EXIT
