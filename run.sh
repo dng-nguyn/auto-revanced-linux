@@ -4,7 +4,7 @@ cd "$(dirname "$0")"
 source .env
 
 CURRENT_TIME=$(date +'<t:%s:F>')
-echo "$CURRENT_TIME Executing ReVanced script..." | curl -d "content=$(cat -)" -X POST $DISCORD_WEBHOOK_LOGS
+
 update_function() {
 # Download patches, integrations and cli
 echo "Downloading required files..."
@@ -122,6 +122,8 @@ curl "$DISCORD_WEBHOOK_URL" \
 cd "$(dirname "${BASH_SOURCE[0]}")"
 # Remove files before installation:
 remove_files
+
+
 nextcloud_run () {
 nextcloud_delete_old
 update_function
@@ -131,6 +133,22 @@ discord_webhook
 remove_files
 }
 
+normal_run () {
+update_function
+remove_files
+}
+
+execute_script () {
+    if [ -z "$NEXTCLOUD_INSTANCE_URL" ] || [ -z "$NEXTCLOUD_USERNAME" ] || [ -z "$NEXTCLOUD_PASSWORD" ] || [ -z "$DISCORD_WEBHOOK_URL" ]; then
+		echo "Missing variables. Executing locally."
+		normal_run
+    else
+		echo "Running with Nextcloud and Discord."
+		echo "$CURRENT_TIME Executing ReVanced script..." | curl -d "content=$(cat -)" -X POST $DISCORD_WEBHOOK_LOGS
+		nextcloud_run
+    fi
+}
+
 echo "Checking for updates..."
 
 latest_version=$(curl -s https://raw.githubusercontent.com/ReVanced/revanced-patches/refs/heads/main/patches/src/main/kotlin/app/revanced/patches/youtube/ad/video/VideoAdsPatch.kt | grep -oE '[0-9]+\.[0-9]+\.[0-9]+' | sort -V | tail -n 1)
@@ -138,35 +156,44 @@ version_file="version.txt"
 
 trap 'remove_files' EXIT
 
-# Check if version.txt exists
+# Check if DISCORD_WEBHOOK_LOGS is set and not empty
+log() {
+    if [ -n "$DISCORD_WEBHOOK_LOGS" ]; then
+        echo "$1" | curl -d "content=$(cat -)" -X POST $DISCORD_WEBHOOK_LOGS
+    else
+        echo "$1"
+    fi
+}
+
+# Check for version.txt
 if [ -e "$version_file" ]; then
     # Read the local version from the version.txt file
     local_version=$(cat "$version_file")
 
     # Check if local_version is empty
     if [ -z "$local_version" ]; then
-        echo "version.txt is found, but it is empty. Executing the script..." | curl -d "content=$(cat -)" -X POST $DISCORD_WEBHOOK_LOGS
-        nextcloud_run
+        log "version.txt is found, but it is empty. Executing the script..."
+        execute_script
     else
         # Compare versions
         if [ "$latest_version" \> "$local_version" ]; then
-            echo "Updating to the latest version: $latest_version" | curl -d "content=$(cat -)" -X POST $DISCORD_WEBHOOK_LOGS
-            nextcloud_run
+            log "Updating to the latest version: $latest_version"
+            execute_script
         elif [ "$latest_version" = "$local_version" ]; then
-            echo "You're running on the latest version: $latest_version!" | curl -d "content=$(cat -)" -X POST $DISCORD_WEBHOOK_LOGS
+            log "You're running on the latest version: $latest_version!"
             exit
         else
-            echo "You're running a newer version than expected: Current: $local_version, Source: $latest_version. Please double-check your existing version.txt!" | curl -d "content=$(cat -)" -X POST $DISCORD_WEBHOOK_LOGS
+            log "You're running a newer version than expected: Current: $local_version, Source: $latest_version. Please double-check your existing version.txt!"
             exit 1
         fi
     fi
 else
-    echo "version.txt not found. Executing the script..." | curl -d "content=$(cat -)" -X POST $DISCORD_WEBHOOK_LOGS
-    nextcloud_run
+    log "version.txt not found. Executing the script..."
+    execute_script
 fi
 
 if [ "$DELETE_AFTER_UPLOAD" == "true" ]; then
     # Remove files if the var is true
-    echo "Removing local APK (Uploaded via Nextcloud)...." | curl -d "content=$(cat -)" -X POST $DISCORD_WEBHOOK_LOGS
+    log "Removing local APK (Uploaded via Nextcloud)...."
     rm -rf revanced-$current_version.apk
 fi
