@@ -1,12 +1,10 @@
 patch.jar
 cli.jar
-integrations.apk
 download.json
-yt.apk
-revanced*.apk
+**.apk
 revanced.keystore
 revanced-options.json 
 version.txt
 revanced.jks
 .env
-
+*.rvp
